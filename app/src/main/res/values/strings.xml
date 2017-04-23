@@ -31,5 +31,9 @@
 
     <string name="toast_stock_added_no_connectivity">Symbol %s added. Will refresh when network available.</string>
     <string name="toast_no_connectivity">Will refresh when network available.</string>
+    <string name="field_for_inserting_the_stock">Field for inserting the stock</string>
+    <string name="error_stock_unrecognized">The %s stock does not exists or is unavailable</string>
+    <string name="error_stock_removed">%s was removed from the database</string>
+    <string name="add_new_stock">Add new Stock</string>
 
 </resources>

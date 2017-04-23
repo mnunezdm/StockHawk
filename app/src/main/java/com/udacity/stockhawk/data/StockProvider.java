@@ -9,10 +9,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 
 public class StockProvider extends ContentProvider {
-
     private static final int QUOTE = 100;
     private static final int QUOTE_FOR_SYMBOL = 101;
 
@@ -36,10 +36,10 @@ public class StockProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection,
+                        String[] selectionArgs, String sortOrder) {
         Cursor returnCursor;
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-
         switch (uriMatcher.match(uri)) {
             case QUOTE:
                 returnCursor = db.query(
@@ -52,7 +52,6 @@ public class StockProvider extends ContentProvider {
                         sortOrder
                 );
                 break;
-
             case QUOTE_FOR_SYMBOL:
                 returnCursor = db.query(
                         Contract.Quote.TABLE_NAME,
@@ -130,6 +129,8 @@ public class StockProvider extends ContentProvider {
 
             case QUOTE_FOR_SYMBOL:
                 String symbol = Contract.Quote.getStockFromUri(uri);
+                Log.d("hum", uri.toString());
+                Log.d("hum", selection);
                 rowsDeleted = db.delete(
                         Contract.Quote.TABLE_NAME,
                         '"' + symbol + '"' + " =" + Contract.Quote.COLUMN_SYMBOL,
@@ -186,7 +187,5 @@ public class StockProvider extends ContentProvider {
             default:
                 return super.bulkInsert(uri, values);
         }
-
-
     }
 }
