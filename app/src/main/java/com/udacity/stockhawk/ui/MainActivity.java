@@ -1,6 +1,7 @@
 package com.udacity.stockhawk.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -47,10 +48,16 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.error)
     TextView error;
     private StockAdapter adapter;
+    private Context context;
 
     @Override
     public void onClick(String symbol) {
         Timber.d("Symbol clicked: %s", symbol);
+        Intent intent = new Intent(this, StockActivity.class);
+
+        intent.setData(Contract.Quote.makeUriForStock(symbol));
+        intent.putExtra(Contract.Quote.COLUMN_SYMBOL, symbol);
+        startActivity(intent);
     }
 
     @Override
@@ -67,6 +74,7 @@ public class MainActivity extends AppCompatActivity
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setRefreshing(true);
         onRefresh();
+        context = this;
 
         QuoteSyncJob.initialize(this, this);
         getSupportLoaderManager().initLoader(STOCK_LOADER, null, this);
@@ -83,6 +91,7 @@ public class MainActivity extends AppCompatActivity
                 String symbol = adapter.getSymbolAtPosition(viewHolder.getAdapterPosition());
                 PrefUtils.removeStock(MainActivity.this, symbol);
                 getContentResolver().delete(Contract.Quote.makeUriForStock(symbol), null, null);
+                QuoteSyncJob.updateWidget(context);
             }
         }).attachToRecyclerView(stockRecyclerView);
     }
@@ -129,6 +138,7 @@ public class MainActivity extends AppCompatActivity
             }
             PrefUtils.addStock(this, symbol);
             QuoteSyncJob.syncImmediately(this);
+            QuoteSyncJob.updateWidget(context);
         }
     }
 
@@ -148,6 +158,7 @@ public class MainActivity extends AppCompatActivity
             error.setVisibility(View.GONE);
         }
         adapter.setCursor(data);
+        QuoteSyncJob.updateWidget(context);
     }
 
     @Override

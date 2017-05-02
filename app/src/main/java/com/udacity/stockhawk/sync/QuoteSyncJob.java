@@ -2,21 +2,21 @@ package com.udacity.stockhawk.sync;
 
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
 
+import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 import com.udacity.stockhawk.data.PrefUtils;
+import com.udacity.stockhawk.widget.StockWidgetProvider;
 
 import java.io.IOException;
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -34,15 +34,12 @@ import yahoofinance.quotes.stock.StockQuote;
 public final class QuoteSyncJob {
 
     private static final int ONE_OFF_ID = 2;
-    private static final String ACTION_DATA_UPDATED = "com.udacity.stockhawk.ACTION_DATA_UPDATED";
+    public static final String ACTION_DATA_UPDATED = "com.udacity.stockhawk.ACTION_DATA_UPDATED";
     private static final int PERIOD = 300000;
     private static final int INITIAL_BACKOFF = 10000;
     private static final int PERIODIC_ID = 1;
     private static final int YEARS_OF_HISTORY = 2;
     private static SyncJobCallback callback;
-
-    private QuoteSyncJob(Context context) {
-    }
 
     static void getQuotes(Context context) {
 
@@ -169,6 +166,20 @@ public final class QuoteSyncJob {
 
             scheduler.schedule(builder.build());
         }
+    }
+
+    public static void updateWidget(Context context) {
+        Intent intent = new Intent(context.getApplicationContext(), StockWidgetProvider.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        // Use an array and EXTRA_APPWIDGET_IDS instead of AppWidgetManager.EXTRA_APPWIDGET_ID,
+        // since it seems the onUpdate() is only fired on that:
+        AppWidgetManager widgetManager = AppWidgetManager.getInstance(context);
+        int[] ids = widgetManager.getAppWidgetIds(new ComponentName(context, StockWidgetProvider.class));
+
+        widgetManager.notifyAppWidgetViewDataChanged(ids, R.id.gv_widget_stocks);
+
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        context.sendBroadcast(intent);
     }
 
     public interface SyncJobCallback {

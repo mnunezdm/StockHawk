@@ -35,5 +35,7 @@
     <string name="error_stock_unrecognized">The %s stock does not exists or is unavailable</string>
     <string name="error_stock_removed">%s was removed from the database</string>
     <string name="add_new_stock">Add new Stock</string>
+    <string name="add_widget">Add widget</string>
+    <string name="empty_list">The list of stocks is empty, add one to see it here</string>
 
 </resources>
