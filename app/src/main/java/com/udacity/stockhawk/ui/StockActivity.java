@@ -36,7 +36,7 @@ public class StockActivity extends AppCompatActivity
         setContentView(R.layout.activity_stock);
 
         stockUri = getIntent().getData();
-        setTitle(getIntent().getStringExtra(Contract.Quote.COLUMN_SYMBOL));
+        setTitle(Contract.Quote.getStockFromUri(stockUri));
 
         ButterKnife.bind(this);
         context = this;
